@@ -1,0 +1,40 @@
+library(xts)
+library(Quandl)
+library(MCMCpack)
+library(stargazer)
+
+# Let's look at 10 years of data using Quandl
+AAPL.Q <- Quandl("YAHOO/AAPL", start_date="2005-01-01", type="xts")  ## Apple
+NASDAQ.Q <- Quandl("NASDAQOMX/COMP", start_date="2005-01-01", type="xts")  ## NASDAQ
+AAPL <- AAPL.Q[, "Adjusted Close"]
+NASDAQ <- NASDAQ.Q[, "Index Value"]
+plot(AAPL, main="AAPL ($/Share)")
+plot(NASDAQ, main="NASDAQ")
+rm(list=ls())
+
+# Limit to Five Years
+AAPL.Q <- Quandl("YAHOO/AAPL", start_date="2010-01-01", type="xts")  ## Apple
+NASDAQ.Q <- Quandl("NASDAQOMX/COMP", start_date="2010-01-01", type="xts")  ## NASDAQ
+AAPL <- AAPL.Q[, "Adjusted Close"]
+NASDAQ <- NASDAQ.Q[, "Index Value"]
+data <- merge(as.zoo(AAPL), as.zoo(NASDAQ))  ## Merge into single time-series dataset
+names <- c("AAPL", "NASDAQ")
+colnames(data) <- names
+
+data.level <- as.xts(data)  ## Levels 
+data.returns <- diff(log(data.level), lag=1)  ## Log returns
+data.returns <- na.omit(data.returns)  ## Dump missing values
+
+summary(data.returns$AAPL)
+hist(data.returns$AAPL, breaks=100, col="darkblue", probability=T, main="Histogram of AAPL Daily Returns Since 2010", xlab="Daily Returns")  
+# Histogram of returns.  Do they look normally distributed?  Lots of work in finance depends on normally distributed returns.
+
+summary(data.returns$NASDAQ)
+hist(data.returns$NASDAQ, breaks=100, col="darkblue", probability=T, main="Histogram of NASDAQ Daily Returns Since 2010", xlab="Daily Returns")  
+
+plot.ts(y=data.returns$NASDAQ, x=data.returns$AAPL, pch=16, col="darkblue", main="CAPM Data", xlab="Log Returns of NASDAQ", xlim=c(-.1,.1), ylab="Log Returns of AAPL", ylim=c(-.1,.1))  ## time series plot in R  
+abline(lm(data.returns$AAPL ~ data.returns$NASDAQ), col="red")  ## I added the best fit line so the graph looks similar to that presented in class for Apple.
+
+capm.ols <- lm(AAPL ~ NASDAQ, data=data.returns)  ## Estimate the OLS CAPM
+
+stargazer(capm.ols, ci.level=.95, ci=TRUE, type="text")
