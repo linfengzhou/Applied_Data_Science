@@ -45,10 +45,6 @@ class BivariateNormal:
         plt.xlabel(r'$x_1$', fontsize = 16)
         plt.ylabel(r'$x_2$', fontsize = 16)
         
-m1 = BivariateNormal(1000, [0,0], 1, 1, 0)
-m2 = BivariateNormal(1000, [0,0], 1, 1, -0.5)
-m3 = BivariateNormal(1000, [0,0], 1, 1, 0.8)
-m4 = BivariateNormal(1000, [0,0], 1, 1, 0.99)
 
 def plot4sca():
     fig = plt.figure(figsize=(12,10))
@@ -65,13 +61,16 @@ def plot4sca():
     m4.plot_sca()
     plt.title(r'Scatterplot of $\rho$=0.99', fontsize = 20)
 
+m1 = BivariateNormal(1000, [0,0], 1, 1, 0)
+m2 = BivariateNormal(1000, [0,0], 1, 1, -0.5)
+m3 = BivariateNormal(1000, [0,0], 1, 1, 0.8)
+m4 = BivariateNormal(1000, [0,0], 1, 1, 0.99)
 plot4sca()
 
 m1 = BivariateNormal(10000, [0,0], 1, 1, 0)
 m2 = BivariateNormal(10000, [0,0], 1, 1, -0.5)
 m3 = BivariateNormal(10000, [0,0], 1, 1, 0.8)
 m4 = BivariateNormal(10000, [0,0], 1, 1, 0.99)
-
 plot4sca()
 
 m1 = BivariateNormal(1000, [0,0], 3, 5, 0)
