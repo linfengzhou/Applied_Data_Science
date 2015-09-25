@@ -68,7 +68,7 @@ pred1[1001:1002] > 1
 
 The first mail is not spam, the second one is spam.
 
-### Qustion 3 
+### Question 3 
 3. Using an API such as Quandl, download a daily price series for a particular publicly-traded stock of your choice for a five-year time period (don’t use Apple), as well as the daily price series on the exchange on which it trades.  Using R or Python, calculate the log returns of each series as the natural log of the ratio of (price today/price yesterday).  Use adjusted closing prices as they reflect so-called stock splits.  Using R or Python, generate a histogram of log returns of the stock of your choice.  Using R or Python, generate a scatterplot that relates the log returns of your stock of choice to the log returns of the exchange on which it is traded.  Finally, using R or Python, fit a linear model to obtain estimates of what finance folks call the "alpha" and the "beta".  Is "alpha" significantly different than zero at a 95% level of confidence?  Does a 95% confidence level for "beta" include one?  (Note that your results will depend on the stock price you use.) 
 
 #### Solution
