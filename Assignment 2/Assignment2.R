@@ -86,9 +86,6 @@ fit4 <- lm(y4~x4)
 summary(fit4)
 
 
-
-
-
 ##Question 5
 ## generate norm
 q5 <- function(reptime){
@@ -115,4 +112,12 @@ ggplot(x6,aes(x=x6)) +
   theme_bw()
 
 # Question 7 
+x7<-exp(x6)
+colnames(x7)<-"x7"
+ggplot(x7,aes(x=x7)) + 
+  geom_histogram(binwidth=0.03,fill="white",colour="black")+ 
+  ggtitle("Histogram of exp(beta1)")+
+  theme_bw()
+
+
 

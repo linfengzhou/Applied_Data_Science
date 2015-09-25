@@ -14,19 +14,6 @@ Notes to students:
 Please answer the questions below, disregarding any homework assignments in existing notebooks.
 
 
-   
-
-4. This is a very challenging set of questions, but they address several key topics in data analytics.  You may work with other students on a solution with the recognition that you may not complete this set of questions.  I have frequently used the phrase "data generating process" (or "DGP") to describe the hypothetical process by which observations of data arise in the real world.  We discussed at some length the bivariate linear regression model, $$y_i=\beta_0+\beta_1 x_i+\epsilon_i$$.  In this problem, we will work with a specific DGP and evaluate features of $\widehat \beta_1$, the least squares estimate of $\beta_1$.  Suppose your DGP is $$y_i=1+2x_i+\epsilon_i$$, where $x \sim N(0,1)$ and $\epsilon \sim N(0,1)$.  Using R or Python, write code to generate 1,000 draws for $x$ and $\epsilon$.  Use these draws to generate $y$ in accordance with the given DGP.  Using R or Python, write code to estimate the bivariate model, $$y_i=\beta_0+\beta_1 x_i$$ and to summarize the findings.  
-
-5. Repeat 4 above five different times for a new set of random draws for each replication.  (This effort is called Monte Carlo simulation.  Each time you generate a new set of data and estimate a model, you have a replication.  For example, here you have five replications.)   
-
-6. Write code to automatically repeat 5 above 1,000 times (or 1,000 replications), each time automatically recording the estimated value of $\beta_1$.  Generate a histogram of these 1,000 replications of your estimates of $\beta_1$.  What does the dispersion of these replications measure?  
-
-7. Suppose that you were not interested in the estimate of $\beta_1$, but instead in some functional transformation, such as the estimate of $\exp(\beta_1)$.  What might you do with your 1,000 replications from 6 above to inform you about the distribution of this transformation of $\beta_1$?
-
-Submit code and results.
-
-## Solution 
 ```{r,echo=FALSE,include=FALSE}
 ## set env
 library(foreign)
@@ -39,7 +26,7 @@ set.seed(1335)
 ### Question 1
 1. We discussed at some length the bivariate linear regression model, $$y_i=\beta_0+\beta_1 x_i+\epsilon_i$$  Using R or Python,  generate two series of 1,000 random integers with values between 0 and 9.  Call one series $y$ and the other $x$.  Using R or Python, fit the bivariate linear regression model.  Examine the t-statistic on the coefficient that captures the relationship between $y$ and $x$ to evaluate whether it is greater than two in absolute value.  Would you reject or fail to reject that there is any relationship between these two series?
 
-#### Solution
+#### Answer
 ```{r}
 ## generate samples
 x <- sample(c(0:9), 1000,replace = TRUE) 
@@ -50,39 +37,50 @@ fit1 <- lm(y ~ x)
 summary(fit1)
 ```
 
-##### Comment: 
+##### Comment:
+The t-statistics on the coefiicient $x$ is less than two in absolute value. Therefore, we accept the null hypothesis that there is no relationship between these two series.
 
 ### Question 2
 2. Download the file train.dta from the course website.  These data are formatted as a Stata dataset.  Read this dataset into R or Python.  (For R, you may find the “foreign” library of use.  For Python, we have already installed the Pandas library.  The goal here is to get you familiar with reading datasets with alternative formatting standards.)  Generate summary statistics for the two variables in the data:  (1) $d$, which is an indicator for whether a particular email is spam; and, (2) $x1$, which is an attribute of the email.  Using least squares, regress $d$ on $x1$.  Is the constant statistically significantly different than zero at a 95% level confidence?  Is the coefficient associated with $x1$ statistically significantly different that zero at a 95% level confidence?  Suppose you determine a threshold as to whether an email is spam if the predicted value of $d$ exceeds 1.  In turn, I give you a new email with an attribute value of 0.65 but do not provide a label for the email as to whether it is, in truth, spam.  Given the attribute value of 0.65, would you classify the incoming email as spam or not spam?  Suppose instead I give you another new email with an attribute value of 1.01, but again do not provide a label for the email.  Would you classify it as spam or not spam?
-#### Solution
+#### Answer
 ```{r}
 setwd("~luke/Dropbox/Applied_Data_Science/Assignment 2")
 ## import data 
 data <- read.dta("train.dta")
+```
 
+The summary statistics for the two vairiables in the data are following:
+```{r}
 ### summary data
 summary(data)
 ### fit model
 fit2 <- lm(d ~ x1,data)
 summary(fit2)
+```
+According to the result, $x1$ coefficient is significant, however the  constant is not significant.
 
+```{r}
 ### predict 
 data[1001:1002,2] <- c(0.61,1.01)
 pred1 <- predict(fit2,data)
 pred1[1001:1002] > 1
 ```
 
-##### Comment 
+The first mail is not spam, the second one is spam.
 
 ### Qustion 3 
 3. Using an API such as Quandl, download a daily price series for a particular publicly-traded stock of your choice for a five-year time period (don’t use Apple), as well as the daily price series on the exchange on which it trades.  Using R or Python, calculate the log returns of each series as the natural log of the ratio of (price today/price yesterday).  Use adjusted closing prices as they reflect so-called stock splits.  Using R or Python, generate a histogram of log returns of the stock of your choice.  Using R or Python, generate a scatterplot that relates the log returns of your stock of choice to the log returns of the exchange on which it is traded.  Finally, using R or Python, fit a linear model to obtain estimates of what finance folks call the "alpha" and the "beta".  Is "alpha" significantly different than zero at a 95% level of confidence?  Does a 95% confidence level for "beta" include one?  (Note that your results will depend on the stock price you use.) 
-####Solution
-```{r}
+
+#### Solution
+```{r, include=FALSE}
 NIKE_INDEX<-getSymbols("NKE",from="2010-09-20", to='2015-09-20',src="yahoo") 
 NASQ_INDEX<-getSymbols("^IXIC",from="2010-09-20", to='2015-09-20',src="yahoo")
 NIKE_return=log(NKE$NKE.Adjusted/lag(NKE$NKE.Adjusted))
 NASQ_return=log(IXIC$IXIC.Adjusted/lag(IXIC$IXIC.Adjusted))
+```
 
+
+```{r}
 alldata <- cbind(NIKE_return[,1], NASQ_return[,1])
 
 ### eliminate format
@@ -96,7 +94,6 @@ alldata <- rbind(NIKE_f,NASQ_f)
 alldata <- data.frame(alldata)
 colnames(alldata) <- c("return","stock")
 alldata$stock<-as.factor(alldata$stock)
-levels(alldata$stock)
 alldata$stock<-revalue(alldata$stock,c("0"="NIKE","1"="NASDAQ"))
 ggplot(alldata,aes(x=return)) + 
   geom_histogram(binwidth=0.003,fill="white",colour="black")+ 
@@ -108,7 +105,9 @@ ggplot(alldata,aes(x=return,fill=stock)) +
   ggtitle("Histogram of Stock Return")+
   theme_bw()
 
+```
 
+```{r}
 ### plot scatter plot 
 alldata1<-cbind(NASQ_f[,1],NIKE_f[,1])
 alldata1<-data.frame(alldata1)
@@ -116,6 +115,8 @@ colnames(alldata1)<-c("NIKE","NASDAQ")
 ggplot(alldata1,aes(x=NASDAQ,y=NIKE)) + geom_point()+
   theme_bw()+ggtitle("CAPM Data")
 
+```
+```{r}
 ### fit linear model 
 fit3 <- lm(NIKE~NASDAQ,alldata1)
 summary(fit3)
@@ -125,6 +126,7 @@ residuals1 <- fit3$residuals
 residuals2 <- NASQ_f[,1] - NIKE_f[,1] 
 var.test(residuals1,residuals2)
 
-##
 ```
+
 ##### Comment 
+We reject the null hypothesis. $\alpha$ is not zero, $\beta$ is not include one.
