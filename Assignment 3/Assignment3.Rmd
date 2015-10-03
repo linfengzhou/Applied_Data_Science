@@ -1,0 +1,100 @@
+---
+title: "Assignment3"
+author: "Linfeng Zhou"
+date: "October 3, 2015"
+output: pdf_document
+---
+
+
+## Question 1
+1. Python users, use Python's pandas library to read in the Stata-formatted dataset used in class called "SI Sales.dta".  R users, use R's foreign library to read in the Stata-formatted dataset called "SI Sales Old.dta".  Replicate all of the regression results for this dataset that I presented in class.  
+```{r}
+library(foreign)
+setwd("~luke/Dropbox/Applied_Data_Science/Assignment 3")
+data <- read.dta("SI Sales Old.dta")
+str(data)
+cor(data)
+fit1<-lm(price~unit_size,data)
+summary(fit1)
+fit2<-lm(price ~ unit_size + land_size,data)
+summary(fit2)
+
+fit3<-lm(price ~ unit_size + land_size + age,data)
+summary(fit3)
+
+fit4<-lm(price ~ unit_size + land_size + age + todt,data)
+summary(fit4)
+
+data$priceper1000= data$price/1000
+head(data)
+
+fit5<-lm(priceper1000 ~ unit_size + land_size + age + todt,data)
+summary(fit5)
+
+
+data1<-log(data)
+fit6<-lm(log(priceper1000)~log(unit_size)+
+           log(land_size)+log(age+1)+todt,data)
+summary(fit6)
+```
+
+## Question 2
+2. There is an additional feature in this dataset called "sales_year", which captures the year the sale of a house in Staten Island occurred.  From this feature, generate a feature that is linear time trend.  (A linear time trend is a feature that takes on value "1" in the initial year and increments by "1" each subsequent year.  For example, if 2003 were "1", 2004 would be "2", 2005 would be "3", and so forth.)  Run a linear regression model that relates the sales price to unit size, land size, age, the Todt Hill indicator, and the linear time trend.  How would you interpret the estimated coefficient associated with the linear time trend?  What is the 95% confidence interval of your interpretation?  Based on your regression diagnostics, have you improved the fit of the house price sales data by including the linear time trend as an additional explanatory feature?  
+```{r}
+data$year <- data$sales_year-2002 
+head(data)
+
+fit7<-lm(price ~ unit_size + land_size + age + todt + year,data)
+summary(fit7)
+confint(fit7,level=0.95)
+```
+###Comment:
+- According to the summary of year added model, house prices will increase 6325 by year per unit increase. 
+- The 95% confidence interval results are below argument ```confint(fit7,level=0.95)``` .
+- The adjusted r-squared was increased after including the linear time trend as an additional explanatory feature. 
+
+## Question 3
+3. As noted in class, the unit size and land size features are measured in squared meters.  Suppose I ask you to re-express these features using the Imperial system of square feet rather than square meters, but I express a concern that the interpretation of the estimated coefficients, such as age, would be changed.  Without acutally doing any statistical learning, what would you say to me about my concern?  Rerun the linear regression in 2. using the dwelling size and land size measured in square feet (rather than square meters).  What, if anything, has changed in your estimated coefficients?
+
+```{r}
+data$unit_sizesf <- data$unit_size * 10.7639 
+data$land_sizesf <- data$land_size * 10.7639
+
+fit8<-lm(price~unit_sizesf + land_sizesf + age + todt + year,data)
+summary(fit8)
+```
+###Comment:
+- You don't have to worry about features like age, todt and year. The changes of unit-size and land-size only cause themselves' changes.
+- According to my results, changed parameters are land size and unit size, which prove my opinion. 
+
+## Question 4
+4. (Challenging question.  Feel free to work together to the extent that it assists you.)  Assume the following data generating process (DGP) governs a random sample of size 10,000: $y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \epsilon_i$  for $\epsilon_i \sim N(0,1)$.  Further assume for this DGP that  $\beta_0=\beta_1=\beta_2=1$.  (a) Suppose the following process governs your features: $x_{1i} \sim N(0,1)$ and $x_{2i} \sim N(0,1)$ are independent.  Using R or Python, calculate the correlation between features $x_{1i}$ and $x_{2i}$.  Mistakenly, you decide to estimate a linear regression that includes only the feature $x_{1i}$.  Using R or Python, simulate this DGP and run the mistaken linear regression that includes only feature $x_{1i}$.  What value do you obtain for the coefficient associated with with feature $x_{1i}$?  (b) Suppose instead that the follow process governs your features: $x_{1i}=z_i+\eta_i$ and $x_{2i}=-z_i+\omega_i$, where $z_i \sim N(0,1)$, $\eta_i \sim N(0,1)$, and $\omega_i \sim N(0,1)$ are independent.  Using R or Python, calculate the correlation between features $x_{1i}$ and $x_{2i}$.  Again, you mistakenly decide to estimate a linear regression that includes only the feature $x_{1i}$.  Using R or Python, simulate this DGP and run the mistaken linear regression that includes only feature $x_{1i}$.  What value do you obtain for the coefficient associated with with feature $x_{1i}$?  (c) Are there any conclusions you can draw from your results in (a) and (b)? 
+
+```{r}
+set.seed(1335)
+
+x1 <- rnorm(10000, mean=0, sd=1)
+x2 <- rnorm(10000, mean=0, sd=1)
+e1 <- rnorm(10000, mean=0, sd=1)
+y1 <- 1 + x1 + x2 + e1 
+cor(x1,x2)
+fit9<-lm(y1~x1)
+summary(fit9)
+```
+### Comment:
+The correlation between x1 and x2 is -0.007774456, and the coefficient of x1 is 0.99205.
+
+```{r}
+z1<-rnorm(10000, mean=0, sd=1)
+q1<-rnorm(10000, mean=0, sd=1)
+w1<-rnorm(10000, mean=0, sd=1) 
+
+x2_1<- z1+q1 
+x2_2<- -z1+w1 
+y2 = 1 + x2_1 + x2_2 +e1
+cor(x2_1,x2_2)
+fit10<-lm(y2~x2_1)
+summary(fit10)
+```
+###Comment:
+The coefficient associated with with feature x1 is 0.99205. 

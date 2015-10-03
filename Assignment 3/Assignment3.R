@@ -58,6 +58,6 @@ w1<-rnorm(10000, mean=0, sd=1)
 x2_1<- z1+q1 
 x2_2<- -z1+w1 
 y2 = 1 + x2_1 + x2_2 +e1
-cor(x1,x2)
+cor(x2_1,x2_2)
 fit10<-lm(y2~x2_1)
 summary(fit10)
