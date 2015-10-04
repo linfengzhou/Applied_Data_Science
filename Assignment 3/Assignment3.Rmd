@@ -97,4 +97,4 @@ fit10<-lm(y2~x2_1)
 summary(fit10)
 ```
 ###Comment:
-The coefficient associated with with feature x1 is 0.99205. 
+Our regression model is a combanation of three standard normal distribution. The R-square is calculated by variance. In this situation, the first model only include one normal situation, as you can see, the r-square is only 0.33. The second model r-square can use the same rule to explain. For intercept, standard normal distributions' mean is zero, therefore, it can be correctly estimated whatever how many features you use. As we can see from coefficient results, the standard normal distribution's properties still work on this problem. It didn't change the first model estimation. For the second model, however, both x1 and x2 are combinations of two standard normal distribution. If you only fit the model with one parameter, it only has half of the original settings. If you estimated model by using both x1 and x2, it can give you correctly coefficient results.
